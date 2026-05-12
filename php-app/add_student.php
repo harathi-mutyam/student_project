@@ -1,21 +1,16 @@
 <?php
-include 'config.php';
-
-$name = $_POST['name'];
-$email = $_POST['email'];
-
-$stmt = $conn->prepare("INSERT INTO students (name, email) VALUES (?, ?)");
-$stmt->bind_param("ss", $name, $email);
-
-if ($stmt->execute()) {
-        #echo "Student Added Successfully<br><br>";
-        #echo '<a href="students.php">⬅ Go back</a>';
-        header("Location: students.php");
-        exit();
-} else {
-    echo "Error: " . $conn->error;
-}
-
-$stmt->close();
-$conn->close();
+echo "<h1>Add Student Details</h1>";
 ?>
+
+<link rel="stylesheet" href="style.css">
+
+<form method="POST" action="save_student.php">
+    <input type="text" name="name" placeholder="Name" required>
+
+    <input type="email" name="email" placeholder="Email" required>
+
+    <button type="submit">Add Student</button>
+</form>
+
+<br>
+<a href="index.php">View Students</a>

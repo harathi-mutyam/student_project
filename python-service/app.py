@@ -19,5 +19,3 @@ def home():
     return {
         "total_students": count
     }
-
-app.run(host='0.0.0.0', port=5000)

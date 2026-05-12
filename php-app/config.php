@@ -1,5 +1,5 @@
 <?php
-$host = "mysql-db";
+$host = "mysql";
 $user = "root";
 $password = "root";
 $database = "studentdb";

@@ -9,3 +9,10 @@ RUN docker-php-ext-enable mysqli
 # Enable Apache rewrite (optional)
 RUN a2enmod rewrite
 
+# Copy application files
+COPY . /var/www/html/
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html
+
+EXPOSE 80

@@ -15,7 +15,7 @@ $result = mysqli_query($conn, "SELECT * FROM students WHERE name LIKE '%$search%
 <body>
 
 <h2>Search Results</h2>
-<a href="students.php">⬅ Back</a>
+<a href="index.php">⬅ Back</a>
 
 <table border="1">
   <tr>

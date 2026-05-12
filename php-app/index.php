@@ -43,7 +43,11 @@ while($row = mysqli_fetch_assoc($result)) {
 
 <tr>
     <td><?php echo $row['id']; ?></td>
-    <td><?php echo $row['name']; ?></td>
+    <td>
+    <a href="student_subjects.php?id=<?php echo $row['id']; ?>">
+        <?php echo $row['name']; ?>
+    </a>
+</td>
     <td><?php echo $row['email']; ?></td>
 
     <td>

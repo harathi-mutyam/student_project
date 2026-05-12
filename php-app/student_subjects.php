@@ -48,6 +48,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 <html>
 <head>
     <title>Student Subjects</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 

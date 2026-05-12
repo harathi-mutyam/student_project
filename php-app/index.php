@@ -13,5 +13,4 @@ echo "<h1>Student Management System</h1>";
 </form>
 
 <br>
-
 <a href="students.php">View Students</a>

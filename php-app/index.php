@@ -47,6 +47,7 @@ while($row = mysqli_fetch_assoc($result)) {
     <td><?php echo $row['email']; ?></td>
 
     <td>
+        <a href="edit_student.php?id=<?php echo $row['id']; ?>">Edit</a> |
         <a href="delete_student.php?id=<?php echo $row['id']; ?>"
            onclick="return confirm('Are you sure you want to delete this student?');">
             Delete

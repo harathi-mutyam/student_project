@@ -8,3 +8,4 @@ RUN docker-php-ext-enable mysqli
 
 # Enable Apache rewrite (optional)
 RUN a2enmod rewrite
+

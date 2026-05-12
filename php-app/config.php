@@ -7,7 +7,7 @@ $database = "studentdb";
 $conn = mysqli_connect($host, $user, $password, $database);
 
 if (!$conn) {
-    die("Connection failed");
+    error_log("DB connection failed");
+    exit("System error");
 }
 ?>
-

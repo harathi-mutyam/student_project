@@ -1,5 +1,5 @@
 <?php
-echo "<h1>Student Management System</h1>";
+echo "<h1>Add Student Details</h1>";
 ?>
 
 <link rel="stylesheet" href="style.css">

@@ -118,7 +118,9 @@ docker exec -it mysql mysql -uroot -proot studentdb -e "SELECT email,password FR
 
 ✔ You should see only clean hash
 
-# 🔴 STEP 6 — LOGIN TEST
+# 🔴 STEP 6 — LOGIN TEST  in browser check 
+
+**publicip:8080**
 
 Use:
 

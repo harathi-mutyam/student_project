@@ -155,7 +155,7 @@ if (isset($_POST['update'])) {
 
 <!-- DISPLAY SUBJECTS -->
 
-<table class="table table-bordered">
+<table class="table table-bordered custom-table">
 
 <tr class="table-dark">
 

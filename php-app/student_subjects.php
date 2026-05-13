@@ -3,79 +3,202 @@ include 'config.php';
 
 $student_id = (int)$_GET['id'];
 
-// get student info
+// get student details
 $student = mysqli_fetch_assoc(
-    mysqli_query($conn, "SELECT * FROM students WHERE id=$student_id")
+    mysqli_query($conn,
+    "SELECT * FROM students WHERE id=$student_id")
 );
 
-// fixed 6 subjects
-$subjects = ["Math", "Science", "English", "History", "Computer", "Physics"];
+// ADD SUBJECT MARKS
+if (isset($_POST['add'])) {
 
-// SAVE DATA
-if (isset($_POST['save'])) {
+    $subject = $_POST['subject'];
+    $marks = $_POST['marks'];
 
-    // remove old records (so we update cleanly)
-    mysqli_query($conn, "DELETE FROM subjects WHERE student_id=$student_id");
-
-    foreach ($subjects as $sub) {
-
-        $key = strtolower($sub);
-        $marks = $_POST[$key];
-
-        mysqli_query($conn,
-            "INSERT INTO subjects(student_id, subject_name, marks)
-             VALUES($student_id, '$sub', $marks)"
-        );
-    }
+    mysqli_query($conn,
+        "INSERT INTO subjects(student_id, subject_name, marks)
+         VALUES($student_id, '$subject', '$marks')"
+    );
 
     header("Location: student_subjects.php?id=$student_id");
     exit();
 }
 
-// FETCH EXISTING DATA
-$data = [];
+// DELETE SUBJECT
+if (isset($_GET['delete'])) {
 
-$result = mysqli_query($conn,
-    "SELECT * FROM subjects WHERE student_id=$student_id"
-);
+    $delete_id = (int)$_GET['delete'];
 
-while ($row = mysqli_fetch_assoc($result)) {
-    $data[$row['subject_name']] = $row['marks'];
+    mysqli_query($conn,
+        "DELETE FROM subjects WHERE id=$delete_id"
+    );
+
+    header("Location: student_subjects.php?id=$student_id");
+    exit();
+}
+
+// EDIT SUBJECT
+$edit_data = null;
+
+if (isset($_GET['edit'])) {
+
+    $edit_id = (int)$_GET['edit'];
+
+    $edit_result = mysqli_query($conn,
+        "SELECT * FROM subjects WHERE id=$edit_id"
+    );
+
+    $edit_data = mysqli_fetch_assoc($edit_result);
+}
+
+// UPDATE SUBJECT
+if (isset($_POST['update'])) {
+
+    $subject_id = $_POST['subject_id'];
+
+    $subject = $_POST['subject'];
+    $marks = $_POST['marks'];
+
+    mysqli_query($conn,
+        "UPDATE subjects
+         SET subject_name='$subject',
+             marks='$marks'
+         WHERE id=$subject_id"
+    );
+
+    header("Location: student_subjects.php?id=$student_id");
+    exit();
 }
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student Subjects</title>
-    <link rel="stylesheet" href="style.css">
+
+<title>Student Subjects</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
+
 <body>
 
-<h2>Student: <?php echo $student['name']; ?></h2>
+<div class="container mt-5">
+
+<div class="card shadow p-4">
+
+<h2 class="text-center mb-4">
+    Subjects of <?php echo $student['name']; ?>
+</h2>
+
+<!-- ADD / EDIT FORM -->
 
 <form method="POST">
 
-<table border="1">
+<input type="hidden"
+       name="subject_id"
+       value="<?php echo $edit_data['id'] ?? ''; ?>">
 
-<tr>
-    <th>Subject</th>
-    <th>Marks</th>
+<div class="mb-3">
+
+<label>Subject Name</label>
+
+<input type="text"
+       class="form-control"
+       name="subject"
+       value="<?php echo $edit_data['subject_name'] ?? ''; ?>"
+       required>
+
+</div>
+
+<div class="mb-3">
+
+<label>Marks</label>
+
+<input type="number"
+       class="form-control"
+       name="marks"
+       value="<?php echo $edit_data['marks'] ?? ''; ?>"
+       required>
+
+</div>
+
+<?php if ($edit_data) { ?>
+
+<button type="submit"
+        name="update"
+        class="btn btn-warning">
+
+    Update Marks
+</button>
+
+<a href="student_subjects.php?id=<?php echo $student_id; ?>"
+   class="btn btn-secondary">
+
+   Cancel
+</a>
+
+<?php } else { ?>
+
+<button type="submit"
+        name="add"
+        class="btn btn-success">
+
+    Add Marks
+</button>
+
+<?php } ?>
+
+</form>
+
+<hr>
+
+<!-- DISPLAY SUBJECTS -->
+
+<table class="table table-bordered">
+
+<tr class="table-dark">
+
+<th>ID</th>
+<th>Subject</th>
+<th>Marks</th>
+<th>Action</th>
+
 </tr>
 
-<?php foreach ($subjects as $sub) { 
-    $key = strtolower($sub);
+<?php
+$result = mysqli_query($conn,
+    "SELECT * FROM subjects WHERE student_id=$student_id"
+);
+
+while ($row = mysqli_fetch_assoc($result)) {
 ?>
 
 <tr>
-    <td><?php echo $sub; ?></td>
 
-    <td>
-        <input type="number"
-               name="<?php echo $key; ?>"
-               value="<?php echo $data[$sub] ?? ''; ?>"
-               required>
-    </td>
+<td><?php echo $row['id']; ?></td>
+
+<td><?php echo $row['subject_name']; ?></td>
+
+<td><?php echo $row['marks']; ?></td>
+
+<td>
+
+<a class="btn btn-sm btn-primary"
+   href="student_subjects.php?id=<?php echo $student_id; ?>&edit=<?php echo $row['id']; ?>">
+
+   Edit
+</a>
+
+<a class="btn btn-sm btn-danger"
+   href="student_subjects.php?id=<?php echo $student_id; ?>&delete=<?php echo $row['id']; ?>"
+   onclick="return confirm('Delete subject?')">
+
+   Delete
+</a>
+
+</td>
+
 </tr>
 
 <?php } ?>
@@ -84,13 +207,15 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 <br>
 
-<button type="submit" name="save">Save Subjects</button>
+<a href="index.php"
+   class="btn btn-secondary">
 
-</form>
+   Back
+</a>
 
-<br>
+</div>
 
-<a href="index.php">⬅ Back to Students</a>
+</div>
 
 </body>
 </html>

@@ -1,13 +1,25 @@
 <?php
+
 $host = "mysql";
 $user = "root";
 $password = "root";
 $database = "studentdb";
 
-$conn = mysqli_connect($host, $user, $password, $database);
+$conn = null;
+
+for ($i = 0; $i < 10; $i++) {
+
+    $conn = mysqli_connect($host, $user, $password, $database);
+
+    if ($conn) {
+        break;
+    }
+
+    sleep(2);
+}
 
 if (!$conn) {
-    error_log("DB connection failed");
-    exit("System error");
+    die("Database connection failed: " . mysqli_connect_error());
 }
+
 ?>

@@ -78,6 +78,7 @@ if (isset($_POST['update'])) {
 <title>Student Subjects</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <link rel="stylesheet" href="style.css">
 
 </head>
@@ -158,7 +159,9 @@ if (isset($_POST['update'])) {
 
 <table class="table table-bordered custom-table">
 
-<tr class="table-dark">
+<thead>
+
+<tr>
 
 <th>ID</th>
 <th>Subject</th>
@@ -167,12 +170,23 @@ if (isset($_POST['update'])) {
 
 </tr>
 
+</thead>
+
+<tbody>
+
 <?php
+
 $result = mysqli_query($conn,
     "SELECT * FROM subjects WHERE student_id=$student_id"
 );
 
+$total = 0;
+$count = 0;
+
 while ($row = mysqli_fetch_assoc($result)) {
+
+    $total += $row['marks'];
+    $count++;
 ?>
 
 <tr>
@@ -204,7 +218,46 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 <?php } ?>
 
+</tbody>
+
 </table>
+
+<?php
+
+$percentage = 0;
+$grade = "N/A";
+
+if ($count > 0) {
+
+    $percentage = ($total / ($count * 100)) * 100;
+
+    if ($percentage >= 80) {
+        $grade = "A";
+    }
+    elseif ($percentage >= 60) {
+        $grade = "B";
+    }
+    else {
+        $grade = "C";
+    }
+}
+?>
+
+<div class="mt-4">
+
+<h4>Total Marks: <?php echo $total; ?></h4>
+
+<h4>
+Percentage:
+<?php echo round($percentage, 2); ?>%
+</h4>
+
+<h4>
+Grade:
+<?php echo $grade; ?>
+</h4>
+
+</div>
 
 <br>
 

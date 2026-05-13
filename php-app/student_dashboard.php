@@ -2,33 +2,30 @@
 session_start();
 include 'config.php';
 
-/* LOGIN CHECK */
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'student') {
+if(!isset($_SESSION['user_id'])){
     header("Location: login.php");
     exit();
 }
 
-/* STUDENT ID CHECK */
-if (!isset($_SESSION['student_id'])) {
-    die("Student session missing. Please login again.");
+if(!isset($_SESSION['student_id'])){
+    echo "Student ID not found in session. Please login again.";
+    exit();
 }
 
-$student_id = (int) $_SESSION['student_id'];
+$student_id = $_SESSION['student_id'];
 
-/* STUDENT DATA */
-$studentQuery = mysqli_query($conn, "SELECT * FROM students WHERE id=$student_id");
+/* SAFE QUERY */
+$student = mysqli_fetch_assoc(
+    mysqli_query($conn, "SELECT * FROM students WHERE id=$student_id")
+);
 
-if (!$studentQuery || mysqli_num_rows($studentQuery) == 0) {
-    die("Student not found.");
-}
-
-$student = mysqli_fetch_assoc($studentQuery);
-
-/* SUBJECTS */
-$result = mysqli_query($conn, "SELECT * FROM subjects WHERE student_id=$student_id");
+$result = mysqli_query($conn,
+    "SELECT * FROM subjects WHERE student_id=$student_id"
+);
 
 $total = 0;
 $count = 0;
+
 $subjects = [];
 $marks = [];
 ?>
@@ -37,29 +34,26 @@ $marks = [];
 <html>
 <head>
     <title>Student Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
-<div class="container mt-5">
-<div class="card shadow p-4">
+<div class="card">
 
-<h2 class="text-center">
-Welcome <?php echo htmlspecialchars($student['name']); ?>
-</h2>
+<h2>Welcome <?php echo $student['name'] ?? 'Student'; ?></h2>
 
-<table class="table table-bordered mt-3">
-<thead class="table-dark">
+<table>
+
 <tr>
-<th>Subject</th>
-<th>Marks</th>
+    <th>Subject</th>
+    <th>Marks</th>
 </tr>
-</thead>
 
-<tbody>
-<?php while ($row = mysqli_fetch_assoc($result)) {
+<?php while($row = mysqli_fetch_assoc($result)) {
 
 $total += $row['marks'];
 $count++;
@@ -67,34 +61,34 @@ $count++;
 $subjects[] = $row['subject_name'];
 $marks[] = $row['marks'];
 ?>
+
 <tr>
-<td><?php echo htmlspecialchars($row['subject_name']); ?></td>
-<td><?php echo $row['marks']; ?></td>
+    <td><?php echo $row['subject_name']; ?></td>
+    <td><?php echo $row['marks']; ?></td>
 </tr>
+
 <?php } ?>
-</tbody>
+
 </table>
 
 <?php
 $percentage = ($count > 0) ? ($total / ($count * 100)) * 100 : 0;
 ?>
 
-<h4>Total Marks: <?php echo $total; ?></h4>
-<h4>Percentage: <?php echo round($percentage, 2); ?>%</h4>
+<h3>Total: <?php echo $total; ?></h3>
+<h3>Percentage: <?php echo round($percentage,2); ?>%</h3>
 
-<hr>
-
-<canvas id="marksChart"></canvas>
+<canvas id="chart"></canvas>
 
 <script>
-new Chart(document.getElementById('marksChart'), {
+new Chart(document.getElementById('chart'), {
     type: 'bar',
     data: {
         labels: <?php echo json_encode($subjects); ?>,
         datasets: [{
             label: 'Marks',
             data: <?php echo json_encode($marks); ?>,
-            backgroundColor: 'rgba(54,162,235,0.7)'
+            backgroundColor: 'blue'
         }]
     },
     options: {
@@ -107,9 +101,8 @@ new Chart(document.getElementById('marksChart'), {
 
 <br>
 
-<a href="logout.php" class="btn btn-danger">Logout</a>
+<a href="logout.php">Logout</a>
 
-</div>
 </div>
 
 </body>

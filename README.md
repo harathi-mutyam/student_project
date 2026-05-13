@@ -72,6 +72,7 @@ docker compose up --build -d
 After login to project in EC2 in ssh  make these changes
 
 FINAL FIX STEPS (FOLLOW EXACTLY)
+
 🔴 STEP 1 — Generate correct password hash (IMPORTANT)
 
 Run:
@@ -79,12 +80,17 @@ Run:
 docker exec -it php-app php -r "echo password_hash('admin123', PASSWORD_DEFAULT);"
 
 ✔ Copy the output (it must start with $2y$10$...)
+
 ❌ Do NOT copy anything else
 
 🔴 STEP 2 — Delete old admin user
+
 docker exec -it mysql mysql -uroot -proot studentdb -e "DELETE FROM users WHERE email='admin@gmail.com';"
+
 🔴 STEP 3 — Open MySQL container
+
 docker exec -it mysql mysql -uroot -proot studentdb
+
 🔴 STEP 4 — Insert NEW admin (VERY IMPORTANT)
 
 ## Inside MySQL:
@@ -97,8 +103,11 @@ VALUES(
 );
 
 ✔ Paste ONLY clean hash from Step 1
+
 ❌ No spaces
+
 ❌ No extra text
+
 ❌ No commands
 
 # 🔴 STEP 5 — Verify data
@@ -114,6 +123,7 @@ docker exec -it mysql mysql -uroot -proot studentdb -e "SELECT email,password FR
 Use:
 
 Email: admin@gmail.com
+
 Password: admin123
 
 change the login password in 
@@ -121,6 +131,7 @@ change the login password in
 
 
 docker compose up --build -d 
+
 docker compose down  
 
 or 

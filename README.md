@@ -69,6 +69,11 @@ docker compose up --build -d
 ```
 
 
+docker compose down  
+
+or 
+
+docker compose down -v
 
 
 

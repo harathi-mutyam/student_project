@@ -1,66 +1,28 @@
 <?php
 session_start();
-include 'config.php';
+include "db.php";
 
-$error = "";
+$username = $_POST['username'];
+$password = $_POST['password'];
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+$stmt = $conn->prepare("SELECT * FROM users WHERE username=?");
+$stmt->bind_param("s", $username);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
 
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+if ($user && password_verify($password, $user['password_hash'])) {
 
-    $query = "SELECT * FROM users WHERE email='$email'";
-    $result = mysqli_query($conn, $query);
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['role'] = $user['role'];
 
-    $user = mysqli_fetch_assoc($result);
-
-    if ($user && password_verify($password, $user['password'])) {
-
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['role'] = $user['role'];
-
-        // FIX: only set student_id if exists
-        $_SESSION['student_id'] = $user['student_id'];
-
-        if ($user['role'] == 'admin') {
-            header("Location: index.php");
-        } else {
-            header("Location: student_dashboard.php");
-        }
-        exit();
-
+    if ($user['role'] == 'admin') {
+        header("Location: index.php");
     } else {
-        $error = "Invalid login details";
+        header("Location: student_dashboard.php");
     }
+
+} else {
+    echo "Invalid login";
 }
 ?>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<div style="text-align:center; margin-top:100px;">
-
-    <h2>Login</h2>
-
-    <form method="POST">
-
-        <input type="email" name="email" placeholder="Email" required><br><br>
-
-        <input type="password" name="password" placeholder="Password" required><br><br>
-
-        <button type="submit">Login</button>
-
-    </form>
-
-    <p style="color:red;"><?php echo $error; ?></p>
-
-</div>
-
-</body>
-</html>
-

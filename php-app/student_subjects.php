@@ -103,7 +103,7 @@ if (isset($_POST['update'])) {
 
 <div class="mb-3">
 
-<label>Subject Name</label>
+<label class="text-start d-block">Subject Name</label>
 
 <input type="text"
        class="form-control"
@@ -115,7 +115,7 @@ if (isset($_POST['update'])) {
 
 <div class="mb-3">
 
-<label>Marks</label>
+<label class="text-start d-block">Marks</label>
 
 <input type="number"
        class="form-control"

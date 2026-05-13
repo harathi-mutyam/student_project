@@ -1,109 +1,73 @@
 <?php
 session_start();
-include 'config.php';
+include "db.php";
 
-if(!isset($_SESSION['user_id'])){
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'student') {
     header("Location: login.php");
     exit();
 }
 
-if(!isset($_SESSION['student_id'])){
-    echo "Student ID not found in session. Please login again.";
-    exit();
-}
+$user_id = $_SESSION['user_id'];
 
-$student_id = $_SESSION['student_id'];
+// GET STUDENT
+$student = $conn->query("
+    SELECT * FROM students WHERE user_id=$user_id
+")->fetch_assoc();
 
-/* SAFE QUERY */
-$student = mysqli_fetch_assoc(
-    mysqli_query($conn, "SELECT * FROM students WHERE id=$student_id")
-);
+$student_id = $student['id'];
 
-$result = mysqli_query($conn,
-    "SELECT * FROM subjects WHERE student_id=$student_id"
-);
+// GET MARKS
+$marks = $conn->query("
+    SELECT * FROM marks WHERE student_id=$student_id
+");
 
+// CALCULATE PERCENTAGE
 $total = 0;
 $count = 0;
+$data = [];
 
-$subjects = [];
-$marks = [];
-?>
+while ($row = $marks->fetch_assoc()) {
+    $total += $row['marks'];
+    $count++;
+    $data[] = $row;
+}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student Dashboard</title>
-
-    <link rel="stylesheet" href="style.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-
-<body>
-
-<div class="card">
-
-<h2>Welcome <?php echo $student['name'] ?? 'Student'; ?></h2>
-
-<table>
-
-<tr>
-    <th>Subject</th>
-    <th>Marks</th>
-</tr>
-
-<?php while($row = mysqli_fetch_assoc($result)) {
-
-$total += $row['marks'];
-$count++;
-
-$subjects[] = $row['subject_name'];
-$marks[] = $row['marks'];
-?>
-
-<tr>
-    <td><?php echo $row['subject_name']; ?></td>
-    <td><?php echo $row['marks']; ?></td>
-</tr>
-
-<?php } ?>
-
-</table>
-
-<?php
 $percentage = ($count > 0) ? ($total / ($count * 100)) * 100 : 0;
 ?>
 
-<h3>Total: <?php echo $total; ?></h3>
-<h3>Percentage: <?php echo round($percentage,2); ?>%</h3>
+<h2>Welcome <?= $student['name'] ?></h2>
+
+<h3>Percentage: <?= round($percentage, 2) ?>%</h3>
+
+<table border="1">
+    <tr>
+        <th>Subject</th>
+        <th>Marks</th>
+    </tr>
+
+    <?php foreach ($data as $m) { ?>
+        <tr>
+            <td><?= $m['subject'] ?></td>
+            <td><?= $m['marks'] ?></td>
+        </tr>
+    <?php } ?>
+</table>
 
 <canvas id="chart"></canvas>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-new Chart(document.getElementById('chart'), {
+const ctx = document.getElementById('chart');
+
+new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: <?php echo json_encode($subjects); ?>,
+        labels: <?= json_encode(array_column($data, 'subject')) ?>,
         datasets: [{
             label: 'Marks',
-            data: <?php echo json_encode($marks); ?>,
+            data: <?= json_encode(array_column($data, 'marks')) ?>,
             backgroundColor: 'blue'
         }]
-    },
-    options: {
-        scales: {
-            y: { beginAtZero: true, max: 100 }
-        }
     }
 });
 </script>
-
-<br>
-
-<a href="logout.php">Logout</a>
-
-</div>
-
-</body>
-</html>

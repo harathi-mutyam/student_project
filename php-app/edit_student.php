@@ -14,7 +14,7 @@ if (isset($_POST['update'])) {
     $name = $_POST['name'];
     $email = $_POST['email'];
 
-    $sql = "UPDATE students 
+    $sql = "UPDATE students
             SET name='$name', email='$email'
             WHERE id=$id";
 

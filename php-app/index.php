@@ -3,13 +3,11 @@
 session_start();
 
 if(!isset($_SESSION['user_id'])){
-
     header("Location: login.php");
     exit();
 }
 
 if($_SESSION['role'] != 'admin'){
-
     header("Location: student_dashboard.php");
     exit();
 }
@@ -26,6 +24,69 @@ include 'config.php';
 
     <link rel="stylesheet" href="style.css">
 
+    <!-- UI IMPROVEMENT (optional but recommended) -->
+<style>
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* TABLE BASE */
+table {
+    border-collapse: collapse;
+    width: 80%;
+    margin: auto;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+}
+
+/* HEADER */
+th {
+    background: #0d6efd;   /* Bootstrap blue */
+    color: white;
+    padding: 12px;
+    text-align: center;
+}
+
+/* CELLS */
+td {
+    padding: 12px;
+    text-align: center;
+    color: #000;
+}
+
+/* ROW COLORS (BLUE STYLE) */
+tr:nth-child(even) {
+    background: #f2f7ff;
+}
+
+tr:nth-child(odd) {
+    background: #ffffff;
+}
+
+/* HOVER EFFECT */
+tr:hover {
+    background: #dbe9ff;
+}
+
+/* LINKS */
+td a {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+td a:hover {
+    color: #084298;
+    text-decoration: underline;
+}
+
+/* PAGE ALIGNMENT */
+.container {
+    text-align: center;
+}
+</style>
 </head>
 
 <body>
@@ -35,10 +96,16 @@ include 'config.php';
 
     <h1 style="margin:0;">Student Management System</h1>
 
-    <a href="logout.php"
-       style="background:red; color:white; padding:8px 14px; text-decoration:none; border-radius:5px;">
-        Logout
-    </a>
+    <div>
+        <span style="margin-right:15px; font-weight:bold;">
+            Welcome Admin
+        </span>
+
+        <a href="logout.php"
+           style="background:red; color:white; padding:8px 14px; text-decoration:none; border-radius:5px;">
+            Logout
+        </a>
+    </div>
 
 </div>
 
@@ -71,7 +138,7 @@ include 'config.php';
 <!-- STUDENT TABLE -->
 <div style="display:flex; justify-content:center;">
 
-<table border="1" cellpadding="10" cellspacing="0" style="border-collapse:collapse; text-align:center;">
+<table border="1" cellspacing="0" cellpadding="10" style="text-align:center;">
 
     <tr style="background:#333; color:white;">
         <th>ID</th>
@@ -82,9 +149,18 @@ include 'config.php';
 
     <?php
 
-    $result = mysqli_query($conn, "SELECT * FROM students");
+    // SAFE QUERY (explicit columns)
+    $result = mysqli_query($conn, "SELECT id, name, email FROM students");
 
-    while($row = mysqli_fetch_assoc($result)) {
+    if(!$result){
+        echo "<tr><td colspan='4'>Database error</td></tr>";
+    }
+    else if(mysqli_num_rows($result) == 0){
+        echo "<tr><td colspan='4'>No students found</td></tr>";
+    }
+    else {
+
+        while($row = mysqli_fetch_assoc($result)) {
     ?>
 
     <tr>
@@ -119,7 +195,10 @@ include 'config.php';
 
     </tr>
 
-    <?php } ?>
+    <?php
+        }
+    }
+    ?>
 
 </table>
 

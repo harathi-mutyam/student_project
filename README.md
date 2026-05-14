@@ -65,6 +65,10 @@ docker ps
 
 git clone repositoryname
 
+ls
+
+cd foldername
+
 docker compose up --build -d
 ```
 

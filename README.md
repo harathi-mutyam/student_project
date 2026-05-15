@@ -72,7 +72,8 @@ cd foldername
 docker compose up --build -d
 ```
 
-
+```shell
+ignore this part i made a changes according in the code
 After login to project in EC2 in ssh  make these changes
 
 FINAL FIX STEPS (FOLLOW EXACTLY)
@@ -134,7 +135,7 @@ Password: admin123
 
 change the login password in 
 
-
+```
 
 docker compose up --build -d 
 
